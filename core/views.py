@@ -12,6 +12,7 @@ from .serializer import (
 from .models import User, UserProfile, Todo, Forum, Message, Workspace
 from rest_framework.generics import ListCreateAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class UserSignupView(APIView):
@@ -27,11 +28,13 @@ class UserSignupView(APIView):
                 profile = UserProfile.objects.create(
                     user=user, **serializer.validated_data["profile"]
                 )
-
+            refresh = RefreshToken.for_user(user)
             return Response(
                 {
                     "user": UserSerializer(user).data,
                     "profile": UserProfileSerializer(profile).data,
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
                 },
                 status=201,
             )
