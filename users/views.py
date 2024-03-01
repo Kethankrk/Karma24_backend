@@ -1,7 +1,7 @@
 from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveAPIView
 from rest_framework.views import APIView, Response
 from core.models import Workspace, User
-from .serializer import lol
+from .serializer import CustomWorkSpaceSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
@@ -16,8 +16,8 @@ class GetUserWorkspaces(APIView):
 
             return Response(
                 {
-                    "owned": lol(o_workspace, many=True).data,
-                    "joined": lol(m_workspace, many=True).data,
+                    "owned": CustomWorkSpaceSerializer(o_workspace, many=True).data,
+                    "joined": CustomWorkSpaceSerializer(m_workspace, many=True).data,
                 }
             )
         except Exception as e:

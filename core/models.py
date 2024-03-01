@@ -40,7 +40,7 @@ class Workspace(models.Model):
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     name = models.CharField(max_length=50)
     phone = models.CharField(max_length=15)
     bio = models.TextField(blank=True)
