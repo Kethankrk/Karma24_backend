@@ -1,8 +1,13 @@
-from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveAPIView
+from rest_framework.generics import (
+    CreateAPIView,
+    ListCreateAPIView,
+    RetrieveAPIView,
+    ListAPIView,
+)
 from rest_framework.views import APIView, Response
 from core.models import Workspace, User
-from .serializer import CustomWorkSpaceSerializer
-from core.serializer import UserProfileSerializer
+from .serializer import CustomWorkSpaceSerializer, CustomUserSerializer
+from core.serializer import UserProfileSerializer, UserSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
@@ -47,5 +52,32 @@ class UpdateUserProfile(APIView):
         try:
             profile = request.user.profile
             return Response(UserProfileSerializer(profile).data)
+        except Exception as e:
+            return Response({"error": str(e)})
+
+
+class GetAllUsers(APIView):
+    authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.user.id
+        try:
+            users = User.objects.all()
+            data = CustomUserSerializer(users, many=True).data
+            result = []
+
+            for user in data:
+                if user_id == user["id"]:
+                    continue
+                if not user["profile"]:
+                    continue
+                result.append(
+                    {
+                        "value": user["id"],
+                        "label": user["profile"]["name"],
+                    }
+                )
+            return Response(result)
         except Exception as e:
             return Response({"error": str(e)})

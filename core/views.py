@@ -15,6 +15,8 @@ from .models import User, UserProfile, Todo, Forum, Message, Workspace, Pages, B
 from rest_framework.generics import ListCreateAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from users.serializer import CustomWorkSpaceSerializer
 
 
 class UserSignupView(APIView):
@@ -23,7 +25,7 @@ class UserSignupView(APIView):
             data = request.data
             serializer = UserCreateProfileSerializer(data=data)
 
-            if not serializer.is_valid():
+            if not serializer.is_valid(raise_exception=True):
                 return Response({"error": "Invalid Data"}, status=400)
             with transaction.atomic():
                 user = User.objects.create_user(**serializer.validated_data["user"])
@@ -45,15 +47,30 @@ class UserSignupView(APIView):
 
 
 class WorkspaceView(APIView):
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            data = request.query_params
+            print(data)
+            workspace_id = data["id"]
+            workspace = Workspace.objects.get(id=workspace_id)
+            return Response(CustomWorkSpaceSerializer(workspace).data)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
+
     def post(self, request, *args, **kwargs):
+        user_id = request.user.id
         try:
             data = request.data
+            print(data)
             serializer = WorkspaceSerialiezr(data=data)
             if not serializer.is_valid():
                 return Response({"error": "Invalid data"}, status=400)
             with transaction.atomic():
                 workspace = serializer.save()
                 owners = data["owners"]
+                workspace.owners.add(user_id)
                 if owners:
                     for owner in owners:
                         workspace.owners.add(owner)
@@ -66,7 +83,7 @@ class WorkspaceView(APIView):
             return Response({"workspace": serializer.data}, status=200)
 
         except Exception as e:
-            return Response({"error": str(e)})
+            return Response({"error": str(e)}, status=400)
 
 
 class AddForumView(CreateAPIView):
@@ -96,19 +113,21 @@ class BlankPageView(ModelViewSet):
 
 class PageDetailsView(APIView):
 
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         try:
-            data = request.data
+            data = request.query_params
             page = Pages.objects.get(id=int(data["id"]))
             if page.page_type == "TODO":
                 page_details = page.todos.all()
                 print("type todo")
                 page_details_data = TodoSerializer(page_details, many=True).data
             else:
-                page_details = page.blank_page.all()
+                page_details = page.blank_page
                 print(page_details)
-                page_details_data = BlankPageSerializer(page_details, many=True).data
+                page_details_data = BlankPageSerializer(page_details).data
 
-            return Response({"page": page_details_data})
+            return Response(
+                {"page": PageSerializer(page).data, "details": page_details_data}
+            )
         except Exception as e:
             return Response({"error": str(e)}, status=400)

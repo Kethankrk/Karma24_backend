@@ -45,7 +45,7 @@ class UserProfile(models.Model):
     phone = models.CharField(max_length=15)
     bio = models.TextField(blank=True)
     image = models.URLField(
-        'default="https://th.bing.com/th/id/R.19fa7497013a87bd77f7adb96beaf768?rik=144XvMigWWj2bw&riu=http%3a%2f%2fwww.pngall.com%2fwp-content%2fuploads%2f5%2fUser-Profile-PNG-High-Quality-Image.png&ehk=%2bat%2brmqQuJrWL609bAlrUPYgzj%2b%2f7L1ErXRTN6ZyxR0%3d&risl=&pid=ImgRaw&r=0'
+        default="https://img.freepik.com/premium-vector/user-icon_126283-435.jpg?w=740"
     )
 
     def __str__(self):
@@ -56,6 +56,7 @@ class Pages(models.Model):
     PAGE_CHOICES = {"TODO": "todo", "BLANK": "blank"}
     name = models.CharField(max_length=100)
     page_type = models.CharField(max_length=5, choices=PAGE_CHOICES)
+    description = models.TextField(blank=True)
     workspace = models.ForeignKey(
         Workspace, on_delete=models.CASCADE, related_name="pages"
     )
@@ -69,6 +70,9 @@ class Todo(models.Model):
     title = models.CharField(max_length=200)
     due_date = models.DateField()
     completed = models.BooleanField(default=False)
+    assigned = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="assigned_todo"
+    )
 
     def __str__(self):
         return self.title
@@ -102,7 +106,9 @@ class Message(models.Model):
 
 class BlankPage(models.Model):
     title = models.CharField(max_length=200)
-    page = models.ForeignKey(Pages, on_delete=models.CASCADE, related_name="blank_page")
+    page = models.OneToOneField(
+        Pages, on_delete=models.CASCADE, related_name="blank_page"
+    )
     body = models.TextField(blank=True)
 
     def __str__(self):

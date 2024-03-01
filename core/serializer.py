@@ -43,6 +43,14 @@ class ForumSerializer(ModelSerializer):
         fields = "__all__"
 
 
+class UserNameFromIdSerializer(ModelSerializer):
+    profile = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ("id", "profile")
+
+
 class WorkspaceFullSerilalizer(ModelSerializer):
     class Meta:
         model = Workspace
