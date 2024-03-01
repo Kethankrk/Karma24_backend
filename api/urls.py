@@ -7,4 +7,5 @@ urlpatterns = [
     path("core/", include("core.urls")),
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("user/", include("users.urls")),
 ]
