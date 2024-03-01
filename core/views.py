@@ -7,9 +7,11 @@ from .serializer import (
     TodoSerializer,
     WorkspaceSerialiezr,
     ForumSerializer,
+    WorkspaceFullSerilalizer,
 )
-from .models import User, UserProfile, Todo, Forum, Message
-from rest_framework.generics import ListCreateAPIView, CreateAPIView
+from .models import User, UserProfile, Todo, Forum, Message, Workspace
+from rest_framework.generics import ListCreateAPIView, CreateAPIView, UpdateAPIView
+from rest_framework.viewsets import ModelViewSet
 
 
 class UserSignupView(APIView):
@@ -35,11 +37,6 @@ class UserSignupView(APIView):
             )
         except Exception as e:
             return Response({"error": str(e)}, status=400)
-
-
-class TodoView(ListCreateAPIView):
-    queryset = Todo.objects.all()
-    serializer_class = TodoSerializer
 
 
 class WorkspaceView(APIView):
@@ -70,3 +67,13 @@ class WorkspaceView(APIView):
 class AddForumView(CreateAPIView):
     queryset = Forum.objects.all()
     serializer_class = ForumSerializer
+
+
+class UpdateWorkspaceView(UpdateAPIView):
+    queryset = Workspace.objects.all()
+    serializer_class = WorkspaceFullSerilalizer
+
+
+class TodoViews(ModelViewSet):
+    queryset = Todo.objects.all()
+    serializer_class = TodoSerializer

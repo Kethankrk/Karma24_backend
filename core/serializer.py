@@ -41,3 +41,9 @@ class ForumSerializer(ModelSerializer):
     class Meta:
         model = Forum
         fields = "__all__"
+
+
+class WorkspaceFullSerilalizer(ModelSerializer):
+    class Meta:
+        model = Workspace
+        fields = "__all__"
