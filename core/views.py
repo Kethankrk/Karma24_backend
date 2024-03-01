@@ -8,8 +8,10 @@ from .serializer import (
     WorkspaceSerialiezr,
     ForumSerializer,
     WorkspaceFullSerilalizer,
+    PageSerializer,
+    BlankPageSerializer,
 )
-from .models import User, UserProfile, Todo, Forum, Message, Workspace
+from .models import User, UserProfile, Todo, Forum, Message, Workspace, Pages, BlankPage
 from rest_framework.generics import ListCreateAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -80,3 +82,33 @@ class UpdateWorkspaceView(UpdateAPIView):
 class TodoViews(ModelViewSet):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
+
+
+class PagesView(ModelViewSet):
+    queryset = Pages.objects.all()
+    serializer_class = PageSerializer
+
+
+class BlankPageView(ModelViewSet):
+    queryset = BlankPage.objects.all()
+    serializer_class = BlankPageSerializer
+
+
+class PageDetailsView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            page = Pages.objects.get(id=int(data["id"]))
+            if page.page_type == "TODO":
+                page_details = page.todos.all()
+                print("type todo")
+                page_details_data = TodoSerializer(page_details, many=True).data
+            else:
+                page_details = page.blank_page.all()
+                print(page_details)
+                page_details_data = BlankPageSerializer(page_details, many=True).data
+
+            return Response({"page": page_details_data})
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)

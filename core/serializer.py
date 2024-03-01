@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer, Serializer
-from .models import User, UserProfile, Workspace, Todo, Forum
+from .models import User, UserProfile, Workspace, Todo, Forum, Pages, BlankPage
 
 
 class UserSerializer(ModelSerializer):
@@ -46,4 +46,16 @@ class ForumSerializer(ModelSerializer):
 class WorkspaceFullSerilalizer(ModelSerializer):
     class Meta:
         model = Workspace
+        fields = "__all__"
+
+
+class PageSerializer(ModelSerializer):
+    class Meta:
+        model = Pages
+        fields = "__all__"
+
+
+class BlankPageSerializer(ModelSerializer):
+    class Meta:
+        model = BlankPage
         fields = "__all__"

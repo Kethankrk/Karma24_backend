@@ -5,6 +5,7 @@ from .serializer import CustomWorkSpaceSerializer
 from core.serializer import UserProfileSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
 
 
 class GetUserWorkspaces(APIView):
