@@ -27,6 +27,8 @@ INSTALLED_APPS = [
     "users",
     "core",
     "corsheaders",
+    "channels",
+    "chat",
 ]
 
 MIDDLEWARE = [
@@ -161,3 +163,12 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use Redis for production
+    },
+}
+
+ASGI_APPLICATION = "chat.routing.application"

@@ -83,7 +83,7 @@ class Forum(models.Model):
     description = models.TextField(null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    workspace = models.OneToOneField(
+    workspace = models.ForeignKey(
         Workspace, on_delete=models.CASCADE, related_name="forum"
     )
 
@@ -105,11 +105,10 @@ class Message(models.Model):
 
 
 class BlankPage(models.Model):
-    title = models.CharField(max_length=200)
     page = models.OneToOneField(
         Pages, on_delete=models.CASCADE, related_name="blank_page"
     )
-    body = models.TextField(blank=True)
+    body = models.TextField()
 
     def __str__(self):
-        return self.title
+        return str(self.page)

@@ -122,7 +122,15 @@ class PageDetailsView(APIView):
                 print("type todo")
                 page_details_data = TodoSerializer(page_details, many=True).data
             else:
-                page_details = page.blank_page
+                try:
+                    page_details = page.blank_page
+                except Exception as e:
+                    return Response(
+                        {
+                            "page": PageSerializer(page).data,
+                            "details": {},
+                        }
+                    )
                 print(page_details)
                 page_details_data = BlankPageSerializer(page_details).data
 

@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer, Serializer
 from core.models import Workspace, User
-from core.serializer import UserProfileSerializer, PageSerializer
+from core.serializer import UserProfileSerializer, PageSerializer, ForumSerializer
 
 
 class CustomUserSerializer(ModelSerializer):
@@ -15,6 +15,7 @@ class CustomWorkSpaceSerializer(ModelSerializer):
     owners = CustomUserSerializer(many=True)
     members = CustomUserSerializer(many=True)
     pages = PageSerializer(many=True)
+    forum = ForumSerializer(many=True)
 
     class Meta:
         model = Workspace
