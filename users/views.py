@@ -108,6 +108,7 @@ class FileUploadView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
+        print(request.data)
         file_serializer = UploadedFileSerializer(data=request.data)
 
         if file_serializer.is_valid():
@@ -115,3 +116,12 @@ class FileUploadView(APIView):
             return Response(file_serializer.data, status=201)
 
         return Response(file_serializer.errors, status=400)
+
+    def get(self, request, *args, **kwargs):
+        try:
+            data = request.query_params["workspace"]
+            workspace = Workspace.objects.get(id=data)
+            files = workspace.files.all()
+            return Response(UploadedFileSerializer(files, many=True).data)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)

@@ -26,4 +26,4 @@ class CustomWorkSpaceSerializer(ModelSerializer):
 class UploadedFileSerializer(ModelSerializer):
     class Meta:
         model = UploadedFile
-        fields = ("file", "name")
+        fields = "__all__"
