@@ -97,7 +97,6 @@ class Message(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="forums")
     forum = models.ForeignKey(Forum, on_delete=models.CASCADE, related_name="messages")
 
     def __str__(self):

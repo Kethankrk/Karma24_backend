@@ -1,6 +1,7 @@
 from rest_framework.serializers import ModelSerializer, Serializer
 from core.models import Workspace, User
 from core.serializer import UserProfileSerializer, PageSerializer, ForumSerializer
+from .models import UploadedFile
 
 
 class CustomUserSerializer(ModelSerializer):
@@ -20,3 +21,9 @@ class CustomWorkSpaceSerializer(ModelSerializer):
     class Meta:
         model = Workspace
         fields = "__all__"
+
+
+class UploadedFileSerializer(ModelSerializer):
+    class Meta:
+        model = UploadedFile
+        fields = ("file", "name")

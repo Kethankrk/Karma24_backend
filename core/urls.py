@@ -8,6 +8,8 @@ from .views import (
     PagesView,
     BlankPageView,
     PageDetailsView,
+    GetForumView,
+    ForumMessagesView,
 )
 
 from rest_framework.routers import DefaultRouter
@@ -24,4 +26,6 @@ urlpatterns = [
     path("forum/", AddForumView.as_view()),
     path("workspace-edit/<int:pk>", UpdateWorkspaceView.as_view()),
     path("get-page/", PageDetailsView.as_view()),
+    path("get-forums/", GetForumView.as_view()),
+    path("forum-message/", ForumMessagesView.as_view()),
 ] + router.urls

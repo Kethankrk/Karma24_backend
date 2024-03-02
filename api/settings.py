@@ -28,7 +28,6 @@ INSTALLED_APPS = [
     "core",
     "corsheaders",
     "channels",
-    "chat",
 ]
 
 MIDDLEWARE = [
@@ -165,10 +164,16 @@ SIMPLE_JWT = {
 }
 
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use Redis for production
-    },
-}
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use Redis for production
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379, "localhost")],
+#         },
+#     },
+# }
 
-ASGI_APPLICATION = "chat.routing.application"
+ASGI_APPLICATION = "api.asgi.application"
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"

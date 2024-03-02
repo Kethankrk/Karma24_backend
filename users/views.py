@@ -1,3 +1,4 @@
+from datetime import datetime
 from rest_framework.generics import (
     CreateAPIView,
     ListCreateAPIView,
@@ -5,11 +6,16 @@ from rest_framework.generics import (
     ListAPIView,
 )
 from rest_framework.views import APIView, Response
-from core.models import Workspace, User
-from .serializer import CustomWorkSpaceSerializer, CustomUserSerializer
-from core.serializer import UserProfileSerializer, UserSerializer
+from core.models import Workspace, User, Todo
+from .serializer import (
+    CustomWorkSpaceSerializer,
+    CustomUserSerializer,
+    UploadedFileSerializer,
+)
+from core.serializer import UserProfileSerializer, UserSerializer, TodoSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.viewsets import ModelViewSet
 
 
@@ -81,3 +87,31 @@ class GetAllUsers(APIView):
             return Response(result)
         except Exception as e:
             return Response({"error": str(e)})
+
+
+class GetDeadlinedTodos(APIView):
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            user_id = request.user.id
+            todos = Todo.objects.filter(
+                assigned=user_id, due_date__lte=datetime.now(), completed=False
+            )
+            serializer = TodoSerializer(todos, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({"error": str(e)})
+
+
+class FileUploadView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        file_serializer = UploadedFileSerializer(data=request.data)
+
+        if file_serializer.is_valid():
+            file_serializer.save()
+            return Response(file_serializer.data, status=201)
+
+        return Response(file_serializer.errors, status=400)

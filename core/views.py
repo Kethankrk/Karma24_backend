@@ -10,6 +10,10 @@ from .serializer import (
     WorkspaceFullSerilalizer,
     PageSerializer,
     BlankPageSerializer,
+    MessageSerializer,
+    CreateMessageSerailizer,
+    CreateForumSerializer,
+    TodoFullSerializer,
 )
 from .models import User, UserProfile, Todo, Forum, Message, Workspace, Pages, BlankPage
 from rest_framework.generics import ListCreateAPIView, CreateAPIView, UpdateAPIView
@@ -86,9 +90,21 @@ class WorkspaceView(APIView):
             return Response({"error": str(e)}, status=400)
 
 
-class AddForumView(CreateAPIView):
-    queryset = Forum.objects.all()
-    serializer_class = ForumSerializer
+class AddForumView(APIView):
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            user = User.objects.get(id=request.user.id)
+            serializer = CreateForumSerializer(data=request.data)
+            if not serializer.is_valid():
+                return Response({"error": "Invalid data"}, status=400)
+            forum = Forum.objects.create(created_by=user, **serializer.validated_data)
+
+            return Response(ForumSerializer(forum).data, status=201)
+
+        except Exception as e:
+            return Response({"Error": str(e)}, status=400)
 
 
 class UpdateWorkspaceView(UpdateAPIView):
@@ -120,7 +136,7 @@ class PageDetailsView(APIView):
             if page.page_type == "TODO":
                 page_details = page.todos.all()
                 print("type todo")
-                page_details_data = TodoSerializer(page_details, many=True).data
+                page_details_data = TodoFullSerializer(page_details, many=True).data
             else:
                 try:
                     page_details = page.blank_page
@@ -139,3 +155,44 @@ class PageDetailsView(APIView):
             )
         except Exception as e:
             return Response({"error": str(e)}, status=400)
+
+
+class GetForumView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        try:
+            workspace = request.query_params["workspace"]
+            forums = Forum.objects.filter(workspace=workspace)
+            return Response(ForumSerializer(forums, many=True).data)
+        except Exception as e:
+            return Response({"Error": str(e)}, status=400)
+
+
+class ForumMessagesView(APIView):
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            id = request.query_params["id"]
+            forums = Forum.objects.get(id=id)
+            messages = forums.messages.all().order_by("-created_at")
+            msg = MessageSerializer(messages, many=True).data
+            return Response({"forum": ForumSerializer(forums).data, "messages": msg})
+        except Exception as e:
+            return Response({"Error": str(e)}, status=400)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            serializer = MessageSerializer(data=request.data)
+
+            if not serializer.is_valid():
+                return Response({"error": "Invalid data"}, status=400)
+            user = User.objects.get(id=request.user.id)
+            message = Message.objects.create(
+                created_by=user, **serializer.validated_data
+            )
+
+            return Response(MessageSerializer(message).data, status=201)
+
+        except Exception as e:
+            return Response({"Error": str(e)}, status=400)
